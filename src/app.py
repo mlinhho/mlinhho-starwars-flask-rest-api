@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Person, Planet
 #from models import Person
 
 app = Flask(__name__)
@@ -36,14 +36,41 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
+@app.route('/people', methods=['GET'])
+def handle_people():
+    people = Person.query.all()
+    people_as_dictionaries = []
+    for _person in people:
+        people_as_dictionaries.append(_person.to_dict())
+    return jsonify(people_as_dictionaries), 200
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+@app.route('/people/<int:people_id>', methods=['GET'])
+def handle_one_person(people_id):
+    person = Person.query.get(people_id)
+    if person is None:
+        return jsonify({
+            "msg": "no person is found for that id"
+        }), 404
+    else:
+        return jsonify(person.to_dict()),200
+    
+@app.route('/planets', methods=['GET'])
+def handle_planets():
+    planets = Planet.query.all()
+    planets_as_dictionaries = []
+    for _planet in planets:
+        planets_as_dictionaries.append(_planet.to_dict())
+    return jsonify(planets_as_dictionaries), 200
 
-    return jsonify(response_body), 200
+@app.route('/planets/<int:planets_id>', methods=['GET'])
+def handle_one_planet(planets_id):
+    planet = Planet.query.get(planets_id)
+    if planet is None:
+        return jsonify({
+            "msg": "no planet is found for that id"
+        }), 404
+    else:
+        return jsonify(planet.to_dict()),200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
