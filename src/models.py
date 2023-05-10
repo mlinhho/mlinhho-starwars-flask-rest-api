@@ -12,7 +12,11 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
 
     def to_dict(self):
-        return {}
+        return {
+            "id":self.id,
+            "username":self.username,
+            "email":self.email
+        }
 
 class Planet(db.Model):
     # Here we define columns for the table address.
@@ -88,5 +92,21 @@ class Favorite(db.Model):
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
 
+    def __init__(self,user_id,planet_id=None,person_id=None):
+        self.planet_id = planet_id
+        self.person_id = person_id
+        self.user_id = user_id
+        db.session.add(self)
+        db.session.commit()
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
     def to_dict(self):
-        return {}
+        return {
+            "id":self.id,
+            "user_id":self.user_id,
+            "planet_id":self.planet_id,
+            "person_id":self.person_id
+        }
